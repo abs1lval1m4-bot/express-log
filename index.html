@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Express Log - Controle de Carga</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #26384d;
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .painel {
+            width: 430px;
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+
+        .status {
+            text-align: center;
+            padding: 14px;
+
+            background-color: #20b464;
+            color: white;
+
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+
+        .cabecalho {
+            text-align: center;
+            padding: 30px 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cabecalho h1 {
+            color: #26384d;
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .cabecalho p {
+            color: #777;
+        }
+
+
+        .contador-area {
+            text-align: center;
+            padding: 40px 20px 30px;
+        }
+
+        #contador {
+            font-size: 90px;
+            color: #26384d;
+            font-weight: bold;
+        }
+
+        .limite {
+            margin-top: 10px;
+            color: #777;
+            font-size: 16px;
+        }
+
+
+        .botoes {
+            display: flex;
+            gap: 15px;
+
+            padding: 25px;
+
+            border-top: 1px solid #ddd;
+        }
+
+        button {
+            flex: 1;
+
+            padding: 18px 10px;
+
+            border: none;
+            border-radius: 6px;
+
+            background-color: #3b9bd3;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2785bb;
+        }
+
+        button:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
+
+
+        .despachar {
+            width: 100%;
+
+            border-radius: 0;
+
+            background-color: #344b63;
+
+            padding: 20px;
+        }
+
+        .despachar:hover {
+            background-color: #26384d;
+        }
+
+
+        .mensagem {
+            text-align: center;
+            padding: 0 20px 20px;
+
+            color: #555;
+            font-weight: bold;
+        }
+
+
+        .cheio {
+            background-color: #d62828;
+        }
+
+        .alerta {
+            background-color: #e9a800;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="painel">
+
+
+        <div id="status" class="status">
+            BAIA DISPONÍVEL
+        </div>
+
+
+
+        <div class="cabecalho">
+
+            <h1>
+                CONTROLE DE CARGA
+            </h1>
+
+            <p>
+                Unidade de Distribuição: R-09
+            </p>
+
+        </div>
+
+
+
+        <div class="contador-area">
+
+            <div id="contador">
+                0
+            </div>
+
+            <div class="limite">
+                Limite de 50 pacotes
+            </div>
+
+        </div>
+
+
+
+        <div id="mensagem" class="mensagem">
+            Espaço disponível para novos pacotes.
+        </div>
+
+
+
+        <div class="botoes">
+
+            <button id="botao1" onclick="adicionarPacote(1)">
+                +1 Pacote
+            </button>
+
+            <button id="botao5" onclick="adicionarPacote(5)">
+                +5 Pacotes<br>
+                (Lote)
+            </button>
+
+        </div>
+
+
+        <button
+            class="despachar"
+            onclick="despacharCarga()"
+        >
+            Despachar/Limpar Baia
+        </button>
+
+
+    </div>
+
+
+    <script>
+
+        let quantidade = 0;
+
+        const limite = 50;
+
+
+        function adicionarPacote(valor) {
+
+            if (quantidade + valor <= limite) {
+
+                quantidade = quantidade + valor;
+
+            } else {
+
+                quantidade = limite;
+
+            }
+
+            atualizarTela();
+
+        }
+
+
+        function atualizarTela() {
+
+            document.getElementById("contador").textContent =
+                quantidade;
+
+
+            const status =
+                document.getElementById("status");
+
+            const mensagem =
+                document.getElementById("mensagem");
+
+            const botao1 =
+                document.getElementById("botao1");
+
+            const botao5 =
+                document.getElementById("botao5");
+
+
+            if (quantidade >= limite) {
+
+                status.textContent =
+                    "BAIA LOTADA";
+
+                status.classList.add("cheio");
+
+                mensagem.textContent =
+                    "⚠️ Limite de 50 pacotes atingido!";
+
+                botao1.disabled = true;
+                botao5.disabled = true;
+
+            }
+
+            else if (quantidade >= 40) {
+
+                status.textContent =
+                    "ATENÇÃO - BAIA QUASE CHEIA";
+
+                status.classList.remove("cheio");
+
+                status.classList.add("alerta");
+
+                mensagem.textContent =
+                    "⚠️ Pouco espaço disponível.";
+
+                botao1.disabled = false;
+                botao5.disabled = false;
+
+            }
+
+            else {
+
+                status.textContent =
+                    "BAIA DISPONÍVEL";
+
+                status.classList.remove("cheio");
+                status.classList.remove("alerta");
+
+                mensagem.textContent =
+                    "Espaço disponível para novos pacotes.";
+
+                botao1.disabled = false;
+                botao5.disabled = false;
+
+            }
+
+        }
+
+
+       
+        function despacharCarga() {
+
+            quantidade = 0;
+
+            atualizarTela();
+
+        }
+
+    </script>
+
+
+</body>
+
+</html>
